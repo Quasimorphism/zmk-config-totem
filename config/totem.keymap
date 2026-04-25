@@ -15,33 +15,66 @@
 #include <dt-bindings/zmk/keys.h>
 
 / {
+    combos {
+        compatible = "zmk,combos";
+
+        do_nothing_left_5 {
+            bindings = <&none>;
+            key-positions = <12 11 10 13 33>;
+        };
+
+        do_nothing_right_5 {
+            bindings = <&none>;
+            key-positions = <16 36 17 18 19>;
+        };
+
+        do_nothing_left_4 {
+            bindings = <&none>;
+            key-positions = <13 12 11 10>;
+        };
+
+        do_nothing_right_4 {
+            bindings = <&none>;
+            key-positions = <16 17 18 19>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
         base {
             bindings = <
-        &kp Q  &kp W  &kp E    &kp R      &kp T    &kp Y      &kp U          &kp I      &kp O    &kp P
-        &kp A  &kp S  &kp D    &kp F      &kp G    &kp H      &kp J          &kp K      &kp L    &kp SEMI
-&trans  &kp Z  &kp X  &kp C    &kp V      &kp B    &kp N      &kp M          &kp COMMA  &kp DOT  &kp FSLH  &trans
-                      &kp TAB  &kp SPACE  &mo 1    &kp ENTER  &kp BACKSPACE  &kp ENTER
+        &kp Q  &kp W  &kp E    &kp R      &kp T    &kp Y  &kp U          &kp I      &kp O    &kp P
+        &kp A  &kp S  &kp D    &kp F      &kp G    &kp H  &kp J          &kp K      &kp L    &kp SEMI
+&trans  &kp Z  &kp X  &kp C    &kp V      &kp B    &kp N  &kp M          &kp COMMA  &kp DOT  &kp FSLH  &trans
+                      &kp TAB  &kp SPACE  &mo 1    &mo 2  &kp BACKSPACE  &kp ENTER
             >;
         };
 
-        left_arrow {
+        arrow_left {
+            bindings = <
+        &trans  &trans          &trans        &trans          &trans             &trans  &trans  &trans  &trans  &trans
+        &trans  &kp LEFT_ARROW  &kp UP_ARROW  &kp DOWN_ARROW  &kp RIGHT_ARROW    &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans          &trans        &trans          &trans             &trans  &trans  &trans  &trans  &trans  &trans
+                                &trans        &trans          &trans             &trans  &trans  &trans
+            >;
+        };
+
+        arrow_right {
+            bindings = <
+        &trans  &trans  &trans  &trans  &trans    &trans          &trans          &trans        &trans           &trans
+        &trans  &trans  &trans  &trans  &trans    &kp LEFT_ARROW  &kp DOWN_ARROW  &kp UP_ARROW  &kp RIGHT_ARROW  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans          &trans          &trans        &trans           &trans  &trans
+                        &trans  &trans  &trans    &trans          &trans          &trans
+            >;
+        };
+
+        ddd {
             bindings = <
                    &kp LA(BACKSPACE)   &kp BACKSPACE  &kp UP     &kp DELETE     &kp LA(DELETE)        &kp N5      &kp N6           &kp N7       &kp N8    &kp N9
                    &kp LA(LEFT_ARROW)  &kp LEFT       &kp DOWN   &kp RIGHT      &kp LA(RIGHT)         &kp N0      &kp N1           &kp N2       &kp N3    &kp N4
 &kp LG(BACKSPACE)  &kp LG(UP_ARROW)    &kp LG(LEFT)   &kp ENTER  &kp LG(RIGHT)  &kp LG(DOWN_ARROW)    &kp PERIOD  &kp PLUS         &kp MINUS    &kp STAR  &kp FSLH  &kp CARET
                                                       &trans     &trans         &trans                &kp EQUAL   &kp RIGHT_SHIFT  &kp PERCENT
-            >;
-        };
-
-        right_arrow {
-            bindings = <
-           &kp ESC        &kp LEFT_BRACE        &kp RIGHT_BRACE        &none             &none             &kp F1   &kp F2           &kp F3   &kp F4   &kp F5
-           &kp TAB        &kp LBKT              &kp RBKT               &kp ENTER         &kp BSLH          &kp F6   &kp F7           &kp F8   &kp F9   &kp F10
-&kp GRAVE  &kp LESS_THAN  &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS  &kp GREATER_THAN  &kp UNDERSCORE    &kp F11  &kp F12          &kp F13  &kp F14  &kp F15  &kp F16
-                                                &trans                 &trans            &trans            &none    &kp RIGHT_SHIFT  &none
             >;
         };
 
@@ -53,14 +86,16 @@
                                          &none                 &none             &none    &none         &none         &none
             >;
         };
-    };
 
-    conditional_layers {
-        compatible = "zmk,conditional-layers";
-
-        device {
-            if-layers = <1 2>;
-            then-layer = <3>;
+        fff {
+            bindings = <
+           &kp ESC        &kp LEFT_BRACE        &kp RIGHT_BRACE        &none             &none             &kp F1   &kp F2           &kp F3   &kp F4   &kp F5
+           &kp TAB        &kp LBKT              &kp RBKT               &kp ENTER         &kp BSLH          &kp F6   &kp F7           &kp F8   &kp F9   &kp F10
+&kp GRAVE  &kp LESS_THAN  &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS  &kp GREATER_THAN  &kp UNDERSCORE    &kp F11  &kp F12          &kp F13  &kp F14  &kp F15  &kp F16
+                                                &trans                 &trans            &trans            &none    &kp RIGHT_SHIFT  &none
+            >;
         };
     };
+
+    conditional_layers { compatible = "zmk,conditional-layers"; };
 };
