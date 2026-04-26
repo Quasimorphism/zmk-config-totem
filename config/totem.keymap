@@ -6,25 +6,26 @@
 
 #define BASE_WIN 0
 #define BASE_MAC 1
-#define NAV      2
-#define NUM      3
-#define SYM      4
-#define FUN      5
-#define MOUSE    6
-#define SYS      7
-#define IME      8
+#define NAV_R    2
+#define NAV_L    3
+#define NUM      4
+#define SYM      5
+#define FUN      6
+#define MOUSE_R  7
+#define MOUSE_L  8
+#define SYS      9
+#define IME      10
 
 / {
     behaviors {
         /*
-         * Positional home-row mods.
+         * Positional / bilateral home-row mods.
          *
          * Key positions are from the Totem matrix transform:
          *   left hand:  top 0-4,  home 10-14, bottom 21-25, thumbs 32-34
          *   right hand: top 5-9,  home 15-19, bottom 26-30, thumbs 35-37
          *
-         * The ignored outer pinky keys are positions 20 and 31. They are not
-         * hold triggers here.
+         * Ignored outer pinky keys are positions 20 and 31.
          */
         hml: home_row_mod_left {
             compatible = "zmk,behavior-hold-tap";
@@ -50,7 +51,10 @@
             hold-trigger-on-release;
         };
 
-        /* Sticky Shift is quick-release for one capital or one shifted symbol. */
+        /*
+         * Quick-release sticky Shift:
+         * use this for one capital letter or one shifted symbol.
+         */
         skq: sticky_key_quick {
             compatible = "zmk,behavior-sticky-key";
             #binding-cells = <1>;
@@ -61,8 +65,9 @@
         };
 
         /*
-         * Lazy sticky mods are useful for GUI/Alt style modifiers because the
-         * host does not see the modifier unless a following key uses it.
+         * Lazy sticky modifier:
+         * useful for GUI/Alt-style modifiers and mouse interactions because
+         * the host does not see the modifier until a following key uses it.
          */
         skl: sticky_key_lazy {
             compatible = "zmk,behavior-sticky-key";
@@ -75,7 +80,11 @@
     };
 
     macros {
-        /* IME fallback placeholders. Prefer LANG1/LANG2 when the host supports them. */
+        /*
+         * IME fallback placeholders.
+         * Prefer LANG1/LANG2 when the host supports them.
+         * If a host does not handle LANG1 well, try Ctrl+Space or GUI+Space.
+         */
         ime_ctrl_space: ime_ctrl_space {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
@@ -101,9 +110,11 @@
         compatible = "zmk,combos";
 
         /*
-         * Same-hand combos only. The idle guard keeps these out of normal fast
-         * rolls, so accidental triggering stays low.
+         * Same-hand combos only.
+         * No cross-split combos.
+         * require-prior-idle-ms reduces accidental triggering during fast rolls.
          */
+
         combo_esc {
             timeout-ms = <35>;
             require-prior-idle-ms = <200>;
@@ -112,11 +123,43 @@
             layers = <BASE_WIN BASE_MAC>;
         };
 
+        combo_grave {
+            timeout-ms = <35>;
+            require-prior-idle-ms = <200>;
+            key-positions = <10 11>;    /* A + S, below Esc combo */
+            bindings = <&kp GRAVE>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_tilde {
+            timeout-ms = <35>;
+            require-prior-idle-ms = <200>;
+            key-positions = <21 22>;    /* Z + X */
+            bindings = <&kp LS(GRAVE)>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
         combo_del {
             timeout-ms = <35>;
             require-prior-idle-ms = <200>;
             key-positions = <8 9>;      /* O + P */
             bindings = <&kp DEL>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_squote {
+            timeout-ms = <35>;
+            require-prior-idle-ms = <200>;
+            key-positions = <18 19>;    /* L + ;, below Del combo */
+            bindings = <&kp SQT>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_backslash {
+            timeout-ms = <35>;
+            require-prior-idle-ms = <200>;
+            key-positions = <29 30>;    /* . + / */
+            bindings = <&kp BSLH>;
             layers = <BASE_WIN BASE_MAC>;
         };
 
@@ -136,14 +179,6 @@
             layers = <BASE_WIN BASE_MAC>;
         };
 
-        combo_sticky_nav {
-            timeout-ms = <45>;
-            require-prior-idle-ms = <200>;
-            key-positions = <33 34>;    /* Space + Tab, left thumb */
-            bindings = <&sl NAV>;
-            layers = <BASE_WIN BASE_MAC>;
-        };
-
         combo_sticky_ctrl {
             timeout-ms = <35>;
             require-prior-idle-ms = <200>;
@@ -159,6 +194,59 @@
             bindings = <&skl LGUI>;
             layers = <BASE_WIN BASE_MAC>;
         };
+
+        /*
+         * Thumb-layer access.
+         * Space/Tab/Enter/Backspace stay plain keys on the base layers.
+         * Layers are accessed by thumb combos or from SYS/IME.
+         */
+        combo_nav_r {
+            timeout-ms = <60>;
+            require-prior-idle-ms = <200>;
+            key-positions = <33 34>;    /* Space + Tab */
+            bindings = <&sl NAV_R>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_nav_l {
+            timeout-ms = <60>;
+            require-prior-idle-ms = <200>;
+            key-positions = <35 36>;    /* Enter + Backspace */
+            bindings = <&sl NAV_L>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_num_l {
+            timeout-ms = <60>;
+            require-prior-idle-ms = <200>;
+            key-positions = <32 33>;    /* L_OUTER + Space */
+            bindings = <&sl NUM>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_num_r {
+            timeout-ms = <60>;
+            require-prior-idle-ms = <200>;
+            key-positions = <36 37>;    /* Backspace + R_OUTER */
+            bindings = <&sl NUM>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_sym_l {
+            timeout-ms = <60>;
+            require-prior-idle-ms = <200>;
+            key-positions = <32 34>;    /* L_OUTER + Tab */
+            bindings = <&sl SYM>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_sym_r {
+            timeout-ms = <60>;
+            require-prior-idle-ms = <200>;
+            key-positions = <35 37>;    /* Enter + R_OUTER */
+            bindings = <&sl SYM>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
     };
 
     keymap {
@@ -166,132 +254,230 @@
 
         /*
          * BASE_WIN: Windows/Linux base.
-         * Space, Tab, Enter, and Backspace are plain keys to keep long-press
-         * repeat reliable. Layer access uses outer thumbs, sticky layers, and
-         * same-hand thumb combos instead.
+         *
+         * Space, Tab, Enter, and Backspace are plain keys to preserve
+         * long-press repeat. Layer access is done with thumb combos, SYS/IME,
+         * and sticky/toggle layers.
+         *
+         * Home-row mods:
+         *   left:  A=GUI, S=Alt, D=Ctrl, F=Shift
+         *   right: J=Shift, K=Ctrl, L=Alt, ;=GUI
          */
         base_win {
             display-name = "BASE_WIN";
             bindings = <
-        &kp Q     &kp W       &kp E       &kp R       &kp T          &kp Y      &kp U       &kp I       &kp O       &kp P
-        &hml LGUI A &hml LALT S &hml LCTRL D &hml LSHFT F &kp G       &kp H      &hmr RSHFT J &hmr RCTRL K &hmr RALT L &hmr RGUI SEMI
-&none   &kp Z     &kp X       &kp C       &kp V       &kp B          &kp N      &kp M       &kp COMMA   &kp DOT     &kp FSLH    &none
-                              &lt IME LANG1 &kp SPACE &kp TAB        &kp ENTER  &kp BSPC    &mo SYS
+        &kp Q        &kp W        &kp E          &kp R        &kp T          &kp Y        &kp U        &kp I        &kp O        &kp P
+        &hml LGUI A  &hml LALT S  &hml LCTRL D   &hml LSHFT F &kp G          &kp H        &hmr RSHFT J &hmr RCTRL K &hmr RALT L  &hmr RGUI SEMI
+&none   &kp Z        &kp X        &kp C          &kp V        &kp B          &kp N        &kp M        &kp COMMA    &kp DOT      &kp FSLH     &none
+                                      &lt IME LANG1 &kp SPACE    &kp TAB        &kp ENTER    &kp BSPC     &mo SYS
             >;
         };
 
         /*
-         * BASE_MAC: same alpha layout, Mac-specific home-row modifiers.
-         * Command is GUI in HID terms; Option is Alt.
+         * BASE_MAC: macOS base.
+         *
+         * Command is GUI in HID terms.
+         * Option is Alt in HID terms.
+         *
+         * Home-row mods:
+         *   left:  A=Option, S=Control, D=Command, F=Shift
+         *   right: J=Shift, K=Command, L=Control, ;=Option
          */
         base_mac {
             display-name = "BASE_MAC";
             bindings = <
-        &kp Q     &kp W       &kp E       &kp R       &kp T          &kp Y      &kp U       &kp I       &kp O       &kp P
-        &hml LALT A &hml LCTRL S &hml LGUI D &hml LSHFT F &kp G       &kp H      &hmr RSHFT J &hmr RGUI K &hmr RCTRL L &hmr RALT SEMI
-&none   &kp Z     &kp X       &kp C       &kp V       &kp B          &kp N      &kp M       &kp COMMA   &kp DOT     &kp FSLH    &none
-                              &lt IME LANG1 &kp SPACE &kp TAB        &kp ENTER  &kp BSPC    &mo SYS
+        &kp Q        &kp W         &kp E        &kp R        &kp T          &kp Y        &kp U        &kp I       &kp O         &kp P
+        &hml LALT A  &hml LCTRL S  &hml LGUI D  &hml LSHFT F &kp G          &kp H        &hmr RSHFT J &hmr RGUI K &hmr RCTRL L  &hmr RALT SEMI
+&none   &kp Z        &kp X         &kp C        &kp V        &kp B          &kp N        &kp M        &kp COMMA   &kp DOT       &kp FSLH      &none
+                                      &lt IME LANG1 &kp SPACE   &kp TAB        &kp ENTER    &kp BSPC     &mo SYS
             >;
         };
 
         /*
-         * NAV: sticky via Space+Tab or selected from IME/SYS.
-         * H/J/K/L are arrows. Sticky modifiers make one-shot modified arrows
-         * easy; toggling NAV from SYS supports held HRM + arrows.
+         * NAV_R:
+         * Right-hand HJKL navigation.
+         * Left side stays transparent so base HRMs can modify arrows.
+         *
+         * H/J/K/L = Left/Down/Up/Right.
+         * Top row has Home/PgDn/PgUp/End/Del.
+         * No hardcoded Ctrl+Arrow or Alt+Arrow here:
+         *   Win/Linux word movement = Ctrl + arrow through HRM/sticky Ctrl.
+         *   macOS word movement     = Option + arrow through HRM/sticky Option.
          */
-        nav {
-            display-name = "NAV";
+        nav_r {
+            display-name = "NAV_R";
             bindings = <
-        &kp ESC   &kp HOME    &kp PG_DN   &kp PG_UP   &kp END        &kp HOME   &kp PG_DN   &kp PG_UP   &kp END     &kp DEL
-        &trans    &trans      &trans      &trans      &trans         &kp LEFT   &kp DOWN    &kp UP      &kp RIGHT   &kp DEL
-&none   &kp LC(LEFT) &kp LC(RIGHT) &caps_word &key_repeat &trans      &kp INS    &kp LA(LEFT) &kp LA(RIGHT) &trans    &tog MOUSE &none
-                              &trans      &trans      &trans         &trans     &trans      &tog NAV
+        &trans      &trans      &trans      &trans      &trans        &kp HOME        &kp PG_DN      &kp PG_UP      &kp END        &kp DEL
+        &trans      &trans      &trans      &trans      &trans        &kp LEFT        &kp DOWN       &kp UP         &kp RIGHT      &kp ESC
+&none   &trans      &trans      &trans      &trans      &trans        &key_repeat     &caps_word     &trans         &trans         &tog MOUSE_R  &none
+                                &trans      &trans      &trans        &trans          &trans         &trans
             >;
         };
 
         /*
-         * NUM: right-hand number cluster. Left hand stays transparent so base
-         * HRMs can modify number-row keys for Ctrl/Cmd/Alt/Shift + 1..9.
+         * NAV_L:
+         * Left-hand mirrored navigation.
+         * Right side stays transparent so base HRMs can modify arrows.
+         *
+         * Pure mirror of NAV_R:
+         *   G/F/D/S = Left/Down/Up/Right from the left-hand perspective.
+         */
+        nav_l {
+            display-name = "NAV_L";
+            bindings = <
+        &kp DEL      &kp END       &kp PG_UP    &kp PG_DN    &kp HOME       &trans         &trans        &trans        &trans        &trans
+        &kp ESC      &kp RIGHT     &kp UP       &kp DOWN     &kp LEFT       &trans         &trans        &trans        &trans        &trans
+&none   &tog MOUSE_L &trans        &trans       &caps_word   &key_repeat    &trans         &trans        &trans        &trans        &trans       &none
+                                &trans      &trans      &trans        &trans          &trans         &trans
+            >;
+        };
+
+        /*
+         * NUM:
+         * Number-row style instead of numpad style.
+         * This matches FUN and SYM spatially:
+         *   1 2 3 4 5 | 6 7 8 9 0
+         *
+         * Home row is transparent so HRMs remain available for:
+         *   Ctrl/Cmd/Alt/Shift + number.
          */
         num {
             display-name = "NUM";
             bindings = <
-        &trans    &trans      &trans      &trans      &trans         &kp FSLH   &kp N7      &kp N8      &kp N9      &kp STAR
-        &trans    &trans      &trans      &trans      &trans         &kp MINUS  &kp N4      &kp N5      &kp N6      &kp PLUS
-&none   &trans    &trans      &trans      &trans      &trans         &kp N0     &kp N1      &kp N2      &kp N3      &kp DOT     &none
-                              &trans      &trans      &trans         &trans     &trans      &trans
+        &kp N1       &kp N2       &kp N3       &kp N4       &kp N5         &kp N6        &kp N7       &kp N8       &kp N9       &kp N0
+        &trans       &trans       &trans       &trans       &trans         &trans        &trans       &trans       &trans       &trans
+&none   &kp MINUS    &kp EQUAL    &kp DOT      &kp PLUS     &kp FSLH       &kp FSLH      &kp PLUS     &kp DOT      &kp EQUAL    &kp MINUS   &none
+                                &trans       &trans       &trans         &trans        &trans       &trans
             >;
         };
 
         /*
-         * SYM: programming symbols. This starts practical rather than perfectly
-         * symmetric: the right side carries the dense symbol cluster while the
-         * left home row remains available for held HRMs.
+         * SYM:
+         * Symmetric programming symbols.
+         *
+         * Top row mirrors shifted number symbols:
+         *   ! @ # $ % | ^ & * ( )
+         *
+         * Home row is a visual programming-symbol mirror:
+         *   [ < { ( - | + ) } > ]
+         *
+         * Since home row is occupied by symbols here, use sticky modifiers
+         * for modified symbols when needed.
          */
         sym {
             display-name = "SYM";
             bindings = <
-        &kp LS(N1) &kp LS(N2) &kp LS(N3) &kp LS(N4) &kp LS(N5)      &kp LBKT   &kp LS(COMMA) &kp LS(LBKT) &kp LPAR    &kp MINUS
-        &trans    &trans      &trans      &trans      &trans         &kp PLUS   &kp RPAR      &kp LS(RBKT) &kp LS(DOT) &kp RBKT
-&none   &kp LS(N6) &kp LS(N7) &kp LS(N8) &kp LS(MINUS) &kp LS(BSLH) &kp GRAVE  &kp SQT       &kp LS(SQT)  &kp EQUAL   &kp BSLH    &none
-                              &trans      &trans      &trans         &trans     &trans       &trans
+        &kp LS(N1)   &kp LS(N2)   &kp LS(N3)    &kp LS(N4)   &kp LS(N5)     &kp LS(N6)    &kp LS(N7)   &kp LS(N8)   &kp LS(N9)   &kp LS(N0)
+        &kp LBKT     &kp LS(COMMA) &kp LS(LBKT) &kp LS(N9)   &kp MINUS      &kp LS(EQUAL) &kp LS(N0)   &kp LS(RBKT) &kp LS(DOT)  &kp RBKT
+&none   &kp GRAVE    &kp SQT      &kp LS(SQT)   &kp EQUAL    &kp BSLH       &kp BSLH      &kp EQUAL    &kp LS(SQT)  &kp SQT      &kp GRAVE   &none
+                                  &trans        &trans       &trans         &trans        &trans       &trans
             >;
         };
 
         /*
-         * FUN: function keys stay mostly on the right so left-hand HRMs can
-         * produce modified F-keys reliably.
+         * FUN:
+         * Function keys match NUM positions.
+         *
+         * Top row:
+         *   F1 F2 F3 F4 F5 | F6 F7 F8 F9 F10
+         *
+         * Bottom row:
+         *   F11-F20.
+         *
+         * Home row is transparent so HRMs remain available for:
+         *   Ctrl/Cmd/Alt/Shift + F-key.
          */
         fun {
             display-name = "FUN";
             bindings = <
-        &trans    &trans      &trans      &trans      &trans         &kp F1     &kp F2      &kp F3      &kp F4      &kp F5
-        &trans    &trans      &trans      &trans      &trans         &kp F6     &kp F7      &kp F8      &kp F9      &kp F10
-&none   &trans    &trans      &trans      &trans      &trans         &kp F11    &kp F12     &kp F13     &kp F14     &kp F15     &none
-                              &trans      &trans      &trans         &trans     &trans      &trans
+        &kp F1       &kp F2       &kp F3       &kp F4       &kp F5         &kp F6        &kp F7       &kp F8       &kp F9       &kp F10
+        &trans       &trans       &trans       &trans       &trans         &trans        &trans       &trans       &trans       &trans
+&none   &kp F11      &kp F12      &kp F13      &kp F14      &kp F15        &kp F16       &kp F17      &kp F18      &kp F19      &kp F20     &none
+                                &trans       &trans       &trans         &trans        &trans       &trans
             >;
         };
 
         /*
-         * MOUSE: experimental toggle/sticky pointing layer. It is not intended
-         * to be the main pointing solution; click-and-drag on keys is awkward.
+         * MOUSE_R:
+         * Right hand moves the pointer using HJKL.
+         * Right bottom row scrolls in the same directional pattern.
+         * Left hand / left thumb has clicks, so click-drag is less awkward.
+         *
+         * H/J/K/L = Move Left/Down/Up/Right.
+         * N/M/,/. = Scroll Left/Down/Up/Right.
          */
-        mouse {
-            display-name = "MOUSE";
+        mouse_r {
+            display-name = "MOUSE_R";
             bindings = <
-        &tog MOUSE &trans     &msc SCRL_UP &trans     &trans        &trans      &trans       &msc SCRL_UP   &trans       &mkp RCLK
-        &trans     &msc SCRL_LEFT &msc SCRL_DOWN &msc SCRL_RIGHT &trans        &trans      &mkp LCLK    &mkp MCLK     &mkp RCLK    &trans
-&none   &trans     &trans     &trans      &trans      &trans        &mmv MOVE_LEFT &mmv MOVE_DOWN &mmv MOVE_UP &mmv MOVE_RIGHT &trans &none
-                              &trans      &trans      &trans        &mkp LCLK   &mkp RCLK   &tog MOUSE
+        &mkp LCLK    &mkp MCLK    &mkp RCLK    &trans      &trans        &trans          &trans          &trans          &trans           &trans
+        &trans       &trans       &trans       &trans      &trans        &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP    &mmv MOVE_RIGHT  &trans
+&none   &trans       &trans       &trans       &trans      &trans        &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_UP    &msc SCRL_RIGHT  &tog MOUSE_R  &none
+                                &mkp LCLK     &mkp MCLK   &mkp RCLK     &trans          &trans          &tog MOUSE_R
             >;
         };
 
         /*
-         * SYS: hold R_OUTER to enter. Reset/bootloader stay on hard-to-hit
-         * ignored outer pinky positions. BLE profile convention:
-         *   0 = Windows, 1 = Linux, 2 = macOS, 3/4 = spare.
+         * MOUSE_L:
+         * Mirrored mouse layer.
+         * Left hand moves the pointer, right hand / right thumb has clicks.
+         *
+         * Pure mirror of MOUSE_R:
+         *   G/F/D/S = Move Left/Down/Up/Right.
+         *   B/V/C/X = Scroll Left/Down/Up/Right.
+         */
+        mouse_l {
+            display-name = "MOUSE_L";
+            bindings = <
+        &trans       &trans          &trans          &trans           &trans          &trans      &trans      &mkp RCLK    &mkp MCLK    &mkp LCLK
+        &trans       &mmv MOVE_RIGHT &mmv MOVE_UP    &mmv MOVE_DOWN   &mmv MOVE_LEFT  &trans      &trans      &trans       &trans       &trans
+&none   &tog MOUSE_L &msc SCRL_RIGHT &msc SCRL_UP    &msc SCRL_DOWN   &msc SCRL_LEFT  &trans      &trans      &trans       &trans       &trans      &none
+                                &tog MOUSE_L  &trans         &trans          &mkp LCLK   &mkp MCLK   &mkp RCLK
+            >;
+        };
+
+        /*
+         * SYS:
+         * Hold R_OUTER to enter.
+         *
+         * Bluetooth profile convention:
+         *   BT0 = Windows
+         *   BT1 = Linux
+         *   BT2 = macOS
+         *   BT3/BT4 = spare
+         *
+         * Reset and bootloader stay on hard-to-hit ignored outer pinky positions.
          */
         sys {
             display-name = "SYS";
             bindings = <
-        &to BASE_WIN &to BASE_MAC &out OUT_USB &out OUT_BLE &out OUT_TOG       &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4
-        &sl NAV     &sl NUM      &sl SYM     &sl FUN      &tog MOUSE          &bt BT_CLR   &skq LSHFT   &sk LCTRL    &skl LALT    &skl LGUI
-&sys_reset &tog NAV &tog NUM     &tog SYM    &tog FUN     &tog MOUSE          &kp C_MUTE   &kp C_VOL_DN &kp C_VOL_UP &kp C_PP     &key_repeat &bootloader
-                                &trans      &trans       &trans              &trans       &trans       &trans
+        &to BASE_WIN &to BASE_MAC &out OUT_USB &out OUT_BLE &out OUT_TOG      &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
+        &sl NAV_R    &sl NAV_L    &sl NUM     &sl SYM      &sl FUN           &bt BT_CLR    &skq LSHFT     &sk LCTRL      &skl LALT      &skl LGUI
+&sys_reset &tog NAV_R &tog NAV_L   &tog NUM    &tog SYM     &tog FUN          &tog MOUSE_R  &tog MOUSE_L   &kp INS        &key_repeat    &caps_word   &bootloader
+                                &trans       &trans       &trans            &trans        &trans         &trans
             >;
         };
 
         /*
-         * IME: hold/tap L_OUTER. Tap L_OUTER sends LANG1 for Korean/English
-         * where hosts support it; this layer also exposes fallback macros.
+         * IME:
+         * Hold/tap L_OUTER.
+         *
+         * Base behavior:
+         *   tap L_OUTER  = LANG1
+         *   hold L_OUTER = IME layer
+         *
+         * LANG1 is intended for Korean/English toggle when the host supports it.
+         * LANG2 is useful for Hanja on hosts that support it.
+         *
+         * Ctrl+Space and GUI+Space are fallback macros for hosts/input methods
+         * that do not handle LANG1 as expected.
          */
         ime {
             display-name = "IME";
             bindings = <
-        &sl NAV    &sl NUM      &sl SYM     &sl FUN      &tog MOUSE           &kp LANG1    &kp LANG2    &ime_ctrl_space &ime_gui_space &key_repeat
-        &skq LSHFT &sk LCTRL    &skl LALT   &skl LGUI    &caps_word           &kp LEFT     &kp DOWN     &kp UP          &kp RIGHT      &kp DEL
-&none   &trans     &trans       &trans      &trans       &trans               &trans       &trans       &trans          &trans         &trans       &none
-                                &trans      &trans       &trans               &trans       &trans       &trans
+        &kp LANG1   &kp LANG2    &ime_ctrl_space &ime_gui_space &caps_word       &to BASE_WIN  &to BASE_MAC  &sl NAV_R     &sl NAV_L     &sl FUN
+        &skq LSHFT  &sk LCTRL    &skl LALT       &skl LGUI      &sl NUM          &kp LANG1     &kp LANG2     &sl SYM       &tog MOUSE_R  &tog MOUSE_L
+&none   &trans      &trans       &trans          &trans         &trans           &trans        &trans        &trans        &trans        &trans       &none
+                                &trans          &trans         &trans           &trans        &trans        &trans
             >;
         };
     };
@@ -299,6 +485,13 @@
     conditional_layers {
         compatible = "zmk,conditional-layers";
 
+        /*
+         * Optional tri-layer:
+         * if NUM and SYM are active together, FUN becomes active.
+         *
+         * You do not need to rely on this at first; SYS and IME also expose FUN
+         * directly through &sl FUN and &tog FUN.
+         */
         fun_from_num_sym {
             if-layers = <NUM SYM>;
             then-layer = <FUN>;
