@@ -13,8 +13,9 @@
 #define FUN      6
 #define MOUSE_L  7
 #define MOUSE_R  8
-#define SYS      9
-#define IME      10
+#define SYS_L    9
+#define SYS_R    10
+#define IME      11
 
 / {
     behaviors {
@@ -203,19 +204,19 @@
             layers = <BASE_WIN BASE_MAC>;
         };
 
-        combo_grave {
+        combo_ime_as {
             timeout-ms = <35>;
             require-prior-idle-ms = <200>;
-            key-positions = <10 11>;    /* A + S, below Esc */
-            bindings = <&kp GRAVE>;
+            key-positions = <10 11>;    /* A + S */
+            bindings = <&lt IME LANG1>; /* tap = 한/영, hold = IME layer */
             layers = <BASE_WIN BASE_MAC>;
         };
 
-        combo_ime_zx {
+        combo_grave_zx {
             timeout-ms = <35>;
             require-prior-idle-ms = <200>;
             key-positions = <21 22>;    /* Z + X */
-            bindings = <&lt IME LANG1>; /* tap = 한/영, hold = IME layer */
+            bindings = <&kp GRAVE>;
             layers = <BASE_WIN BASE_MAC>;
         };
 
@@ -264,12 +265,12 @@
         };
 
         /*
-         * Thumb-cluster cross-hand layer combos.
+         * Thumb-cluster layer combos.
          *
          * Physical thumb order:
          *   32 Tab | 33 Space | 34 NAV_L || 35 NAV_R | 36 Backspace | 37 Enter
          *
-         * These avoid one-hand "skip over a key" thumb combos.
+         * NUM/SYM/FUN stay cross-hand. SYS has left/right same-side combos.
          */
         combo_num_thumb {
             timeout-ms = <70>;
@@ -295,22 +296,30 @@
             layers = <BASE_WIN BASE_MAC>;
         };
 
-        combo_sys_thumb {
+        combo_sys_l_thumb {
             timeout-ms = <70>;
             require-prior-idle-ms = <200>;
-            key-positions = <32 36>;    /* Tab + Backspace */
-            bindings = <&mo SYS>;
+            key-positions = <32 34>;    /* Tab + NAV_L */
+            bindings = <&mo SYS_L>;
+            layers = <BASE_WIN BASE_MAC>;
+        };
+
+        combo_sys_r_thumb {
+            timeout-ms = <70>;
+            require-prior-idle-ms = <200>;
+            key-positions = <35 37>;    /* NAV_R + Enter */
+            bindings = <&mo SYS_R>;
             layers = <BASE_WIN BASE_MAC>;
         };
 
         /*
          * Mouse toggle:
-         * arrow-layer thumb + one home-row key.
+         * arrow-layer thumb + same-hand index home-row key.
          */
         combo_mouse_l {
             timeout-ms = <60>;
             require-prior-idle-ms = <200>;
-            key-positions = <10 34>;    /* A + NAV_L thumb */
+            key-positions = <13 34>;    /* F + NAV_L thumb */
             bindings = <&tog MOUSE_L>;
             layers = <BASE_WIN BASE_MAC NAV_L MOUSE_L>;
         };
@@ -318,7 +327,7 @@
         combo_mouse_r {
             timeout-ms = <60>;
             require-prior-idle-ms = <200>;
-            key-positions = <19 35>;    /* ; + NAV_R thumb */
+            key-positions = <16 35>;    /* J + NAV_R thumb */
             bindings = <&tog MOUSE_R>;
             layers = <BASE_WIN BASE_MAC NAV_R MOUSE_R>;
         };
@@ -524,8 +533,8 @@
         };
 
         /*
-         * SYS:
-         * Access: Tab + Backspace thumb combo.
+         * SYS_L:
+         * Access: Tab + NAV_L thumb combo.
          *
          * Bluetooth profile convention:
          *   BT0 = Windows
@@ -533,8 +542,25 @@
          *   BT2 = macOS
          *   BT3/BT4 = spare
          */
-        sys {
-            display-name = "SYS";
+        sys_l {
+            display-name = "SYS_L";
+            bindings = <
+        &to BASE_WIN &to BASE_MAC &out OUT_USB &out OUT_BLE &out OUT_TOG    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
+        &mo NAV_L    &mo NUM      &mo SYM     &mo FUN      &tog MOUSE_L    &bt BT_CLR    &skq LSHFT     &sk LCTRL      &skl LALT      &skl LGUI
+&sys_reset &tog NAV_L &tog NUM    &tog SYM    &tog FUN     &tog MOUSE_R    &kp C_MUTE    &kp C_VOL_DN   &kp C_VOL_UP   &kp C_PP       &key_repeat   &bootloader
+                                      &trans    &trans      &trans         &trans        &trans         &trans
+            >;
+        };
+
+        /*
+         * SYS_R:
+         * Access: NAV_R + Enter thumb combo.
+         *
+         * Same bindings as SYS_L for now so either hand can reach system
+         * controls without a cross-hand combo.
+         */
+        sys_r {
+            display-name = "SYS_R";
             bindings = <
         &to BASE_WIN &to BASE_MAC &out OUT_USB &out OUT_BLE &out OUT_TOG    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
         &mo NAV_L    &mo NUM      &mo SYM     &mo FUN      &tog MOUSE_L    &bt BT_CLR    &skq LSHFT     &sk LCTRL      &skl LALT      &skl LGUI
@@ -546,8 +572,8 @@
         /*
          * IME:
          * Access:
-         *   Z + X tap  = LANG1 / 한영
-         *   Z + X hold = IME layer
+         *   A + S tap  = LANG1 / 한영
+         *   A + S hold = IME layer
          */
         ime {
             display-name = "IME";
